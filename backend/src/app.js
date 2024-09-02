@@ -1,16 +1,44 @@
-// backend/src/app.js
 const express = require('express');
-const cors = require('cors');
+const session = require('express-session');
+const passport = require('passport');
+const cors = require('cors'); // Import cors
+const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 const dotenv = require('dotenv');
-const apiRoutes = require('./routes/api');
 
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from your frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use('/api', apiRoutes);
+// Session Middleware (required for Passport)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'default_session_secret',
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
+app.use('/api/users', userRoutes);
+app.use('/auth', authRoutes);
+
+// Default Route
+app.get('/', (req, res) => {
+  res.send('Welcome to the ChatGPT App!');
+});
 
 module.exports = app;

@@ -1,12 +1,12 @@
-// frontend/src/index.jsx
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+import { StyledEngineProvider } from '@mui/material/styles';
 import App from './App';
-import Dashboard from './components/Dashboard'; // Adjust path if needed
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.createRoot(document.querySelector("#root")).render(
   <React.StrictMode>
-    <Dashboard />
+    <StyledEngineProvider injectFirst>
+      <App />
+    </StyledEngineProvider>
   </React.StrictMode>
 );

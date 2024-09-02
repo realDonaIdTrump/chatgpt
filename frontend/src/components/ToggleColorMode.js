@@ -1,16 +1,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded';
+import IconButton from '@mui/material/IconButton';
+
 import ModeNightRoundedIcon from '@mui/icons-material/ModeNightRounded';
-import MenuButton from './MenuButton';
+import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded';
 
 function ToggleColorMode({ mode, toggleColorMode, ...props }) {
   return (
-    <MenuButton
+    <IconButton
       onClick={toggleColorMode}
       size="small"
-      aria-label="button to toggle theme"
+      color="primary"
+      aria-label="Theme toggle button"
       {...props}
     >
       {mode === 'dark' ? (
@@ -18,7 +20,7 @@ function ToggleColorMode({ mode, toggleColorMode, ...props }) {
       ) : (
         <ModeNightRoundedIcon fontSize="small" />
       )}
-    </MenuButton>
+    </IconButton>
   );
 }
 

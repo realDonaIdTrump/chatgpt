@@ -5,6 +5,11 @@ import { Container, Box, Typography, Paper } from '@mui/material';
 import ChatInput from './components/ChatInput';
 import ChatOutput from './components/ChatOutput';
 import './App.css';
+import SignInPage from './SignInPage'; // Import the SignInPage component
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import SignUp from './components/SignUp'; // Import SignUp component
+
+
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -19,17 +24,18 @@ function App() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box mt={4}>
-        <Paper elevation={3} sx={{ padding: 2 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            ChatGPT Application
-          </Typography>
-          <ChatOutput messages={messages} />
-          <ChatInput onSendMessage={handleSendMessage} />
-        </Paper>
-      </Box>
-    </Container>
+    <Router>
+      <Routes>
+        <Route path="/" element={<SignInPage />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/chat" element={
+          <div>
+            <ChatInput />
+            <ChatOutput />
+          </div>
+        } />
+      </Routes>
+    </Router>
   );
 }
 
