@@ -9,7 +9,7 @@ import getSignInTheme from "./theme/getSignInTheme";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "axios"; // Import axios for HTTP requests
 import Alert from "@mui/material/Alert";
-import CheckIcon from "@mui/icons-material/Check";
+import Stack from "@mui/material/Stack";
 
 const SignUpContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -32,7 +32,7 @@ function SignUp() {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const navigate = useNavigate(); // Create navigate function
   const [showSucessAlert, setSuccessAlert] = React.useState(false);
-  const [alertSeverity, setAlertSeverity] = React.useState("success");
+  const [alertSeverity, setAlertSeverity] = React.useState("");
   const [alertMessage, setAlertMessage] = React.useState("");
 
   const handleCancel = () => {
@@ -59,9 +59,10 @@ function SignUp() {
       setTimeout(() => navigate("/"), 2000); // Redirect after 2 seconds
     } catch (error) {
       console.error("Error signing up:", error);
-          // Extract and set the error message
-    const errorMessage = error.response?.data?.error || error.message || 'An error occurred';
-    setAlertMessage(errorMessage);
+      // Extract and set the error message
+      const errorMessage =
+        error.response?.data?.error || error.message || "An error occurred";
+      setAlertMessage(errorMessage);
       setAlertSeverity("error");
       setSuccessAlert(true);
     }
@@ -100,12 +101,9 @@ function SignUp() {
           }}
         >
           {showSucessAlert && (
-            <Alert
-              icon={<CheckIcon fontSize="inherit" />}
-              severity={alertSeverity}
-            >
-              {alertMessage}
-            </Alert>
+            <Stack>
+              <Alert severity={alertSeverity}>{alertMessage}</Alert>
+            </Stack>
           )}
           <TextField
             id="email"
