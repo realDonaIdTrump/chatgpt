@@ -6,13 +6,14 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import TemplateFrame from "./TemplateFrame";
 import getSignInTheme from "./theme/getSignInTheme";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import axios from "axios"; // Import axios for HTTP requests
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 
 // Create a minimal theme that does not override Alert styles
 const minimalTheme = createTheme();
+
 const SignUpContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -27,48 +28,74 @@ const SignUpContainer = styled(Box)(({ theme }) => ({
 
 function SignUp() {
   const [mode, setMode] = React.useState("light");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const navigate = useNavigate(); // Create navigate function
-  const [showAlert, setAlert] = React.useState(false);
-  const [alertSeverity, setAlertSeverity] = React.useState("");
-  const [alertMessage, setAlertMessage] = React.useState("");
+  const [formData, setFormData] = React.useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [alertData, setAlertData] = React.useState({
+    showAlert: false,
+    severity: "",
+    message: "",
+  });
 
-  const handleCancel = () => {
-    navigate("/"); // Navigate to the sign-in page
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
+
+  const validateForm = () => {
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      return "Please enter a valid email address.";
+    }
+    if (formData.password.length < 6) {
+      return "Password must be at least 6 characters long.";
+    }
+    if (formData.password !== formData.confirmPassword) {
+      return "Passwords do not match.";
+    }
+    return null;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Handle sign-up logic here
-    if (password !== confirmPassword) {
-      setAlertSeverity("error");
-      setAlertMessage("Passwords do not match");
-      setAlert(true);
+    const errorMessage = validateForm();
+
+    if (errorMessage) {
+      setAlertData({
+        showAlert: true,
+        severity: "error",
+        message: errorMessage,
+      });
       return;
     }
+
     try {
-      // Make a POST request to your backend API
       await axios.post("http://localhost:5000/api/users/register", {
-        email,
-        password,
+        email: formData.email,
+        password: formData.password,
       });
-      setAlertMessage("Sign up successful! Redirecting to sign-in page...");
-      setAlertSeverity("success");
-      setAlert(true);
-      // Redirect to sign-in page upon successful sign-up
-      setTimeout(() => navigate("/"), 2000); // Redirect after 2 seconds
+      setAlertData({
+        showAlert: true,
+        severity: "success",
+        message: "Sign up successful! Redirecting to sign-in page...",
+      });
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
-      console.error("Error signing up:", error);
-      // Extract and set the error message
       const errorMessage =
         error.response?.data?.error || error.message || "An error occurred";
-      setAlertMessage(errorMessage);
-      setAlertSeverity("error");
-      setAlert(true);
+      setAlertData({
+        showAlert: true,
+        severity: "error",
+        message: errorMessage,
+      });
     }
+  };
+
+  const handleCancel = () => {
+    navigate("/");
   };
 
   const toggleColorMode = () => {
@@ -87,7 +114,7 @@ function SignUp() {
       toggleCustomTheme={toggleCustomTheme}
       mode={mode}
       toggleColorMode={toggleColorMode}
-      showToolbar={false} // Hide the toolbar
+      showToolbar={false}
     >
       <SignUpContainer>
         <Typography variant="h4" sx={{ mb: 2 }}>
@@ -103,45 +130,44 @@ function SignUp() {
             gap: 2,
           }}
         >
-          {showAlert && (
+          {alertData.showAlert && (
             <ThemeProvider theme={minimalTheme}>
               <Stack>
-                <Alert severity={alertSeverity}>{alertMessage}</Alert>
+                <Alert severity={alertData.severity}>
+                  {alertData.message}
+                </Alert>
               </Stack>
             </ThemeProvider>
           )}
           <TextField
             id="email"
+            name="email"
             label="Email"
             type="email"
             fullWidth
             variant="outlined"
             required
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
+            onChange={handleInputChange}
           />
           <TextField
             id="password"
+            name="password"
             label="Password"
             type="password"
             fullWidth
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
             variant="outlined"
             required
+            onChange={handleInputChange}
           />
           <TextField
-            id="confirm-password"
+            id="confirmPassword"
+            name="confirmPassword"
             label="Confirm Password"
             type="password"
             fullWidth
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-            }}
             variant="outlined"
             required
+            onChange={handleInputChange}
           />
           <Button type="submit" variant="contained" fullWidth>
             Sign Up
@@ -150,7 +176,7 @@ function SignUp() {
             type="button"
             fullWidth
             variant="outlined"
-            onClick={handleCancel} // Redirects to OAuth
+            onClick={handleCancel}
           >
             Cancel
           </Button>

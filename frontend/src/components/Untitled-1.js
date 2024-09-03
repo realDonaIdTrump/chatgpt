@@ -22,7 +22,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import Fab from "@mui/material/Fab";
 import CheckIcon from "@mui/icons-material/Check";
 import SaveIcon from "@mui/icons-material/Save";
 
@@ -66,11 +65,11 @@ export default function SignIn() {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const timer = React.useRef(undefined);
   const navigate = useNavigate();
+
   // This code only runs on the client side, to determine the system color preference
   React.useEffect(() => {
     // Check if there is a preferred mode in localStorage
@@ -85,6 +84,7 @@ export default function SignIn() {
       setMode(systemPrefersDark ? "dark" : "light");
     }
   }, []);
+
   React.useEffect(() => {
     return () => {
       clearTimeout(timer.current);
@@ -146,6 +146,7 @@ export default function SignIn() {
     if (!validateInputs()) {
       return; // Stop form submission if validation fails
     }
+
     setSuccess(false);
     setLoading(true);
     timer.current = setTimeout(async () => {
@@ -164,9 +165,7 @@ export default function SignIn() {
           // Handle login failure
           setLoading(false);
           setPasswordError(true);
-          setPasswordErrorMessage(
-            "Login failed. Please check your credentials."
-          );
+          setPasswordErrorMessage("Login failed. Please check your credentials.");
         }
       } catch (error) {
         console.error("Error logging in:", error);
@@ -180,13 +179,9 @@ export default function SignIn() {
   const buttonSx = {
     ...(success && {
       bgcolor: green[500],
-      color: "white", // Change text color to white on success
-      "&:hover": {
+      '&:hover': {
         bgcolor: green[700],
       },
-    }),
-    ...(loading && {
-      color: "white", // Change text color to white when loading
     }),
   };
 
@@ -286,13 +281,9 @@ export default function SignIn() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={buttonSx} // Apply the updated buttonSx
                 disabled={loading}
-                startIcon={
-                  loading ? (
-                    <CircularProgress size={24} sx={{ color: "white" }} />
-                  ) : success
-                }
+                sx={buttonSx}
+                startIcon={loading ? <CircularProgress size={24} color="inherit" /> : success ? <CheckIcon /> : <SaveIcon />}
               >
                 {loading ? "Signing in..." : success ? "Signed in" : "Sign in"}
               </Button>
