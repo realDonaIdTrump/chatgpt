@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createUser, findUserByEmail } = require('../services/userService');
-const bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt');
 
 // Registration Endpoint
 router.post('/register', async (req, res) => {
@@ -31,15 +31,28 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await findUserByEmail(email);
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
+      console.log('User not found');
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    // Hash password
+    console.log('User found:', user); // Log user details
+    console.log(password);
+    const isPasswordCorrect = await bcrypt.compareSync(String(password), String(user.PASSWORD).trim());
+    console.log('Password match:', isPasswordCorrect); // Log result of password comparison
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
     // Set up session or JWT token here
     res.status(200).json({ message: 'Login successful' });
   } catch (error) {
-    res.status(500).json({ error: 'Error logging in' });
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Export the router
 module.exports = router;

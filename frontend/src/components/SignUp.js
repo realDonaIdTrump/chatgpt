@@ -11,6 +11,8 @@ import axios from "axios"; // Import axios for HTTP requests
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 
+// Create a minimal theme that does not override Alert styles
+const minimalTheme = createTheme();
 const SignUpContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -31,7 +33,7 @@ function SignUp() {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const navigate = useNavigate(); // Create navigate function
-  const [showSucessAlert, setSuccessAlert] = React.useState(false);
+  const [showAlert, setAlert] = React.useState(false);
   const [alertSeverity, setAlertSeverity] = React.useState("");
   const [alertMessage, setAlertMessage] = React.useState("");
 
@@ -42,8 +44,9 @@ function SignUp() {
     event.preventDefault();
     // Handle sign-up logic here
     if (password !== confirmPassword) {
-      setPasswordError(true);
-      setPasswordErrorMessage("Passwords do not match.");
+      setAlertSeverity("error");
+      setAlertMessage("Passwords do not match");
+      setAlert(true);
       return;
     }
     try {
@@ -54,7 +57,7 @@ function SignUp() {
       });
       setAlertMessage("Sign up successful! Redirecting to sign-in page...");
       setAlertSeverity("success");
-      setSuccessAlert(true);
+      setAlert(true);
       // Redirect to sign-in page upon successful sign-up
       setTimeout(() => navigate("/"), 2000); // Redirect after 2 seconds
     } catch (error) {
@@ -64,7 +67,7 @@ function SignUp() {
         error.response?.data?.error || error.message || "An error occurred";
       setAlertMessage(errorMessage);
       setAlertSeverity("error");
-      setSuccessAlert(true);
+      setAlert(true);
     }
   };
 
@@ -100,10 +103,12 @@ function SignUp() {
             gap: 2,
           }}
         >
-          {showSucessAlert && (
-            <Stack>
-              <Alert severity={alertSeverity}>{alertMessage}</Alert>
-            </Stack>
+          {showAlert && (
+            <ThemeProvider theme={minimalTheme}>
+              <Stack>
+                <Alert severity={alertSeverity}>{alertMessage}</Alert>
+              </Stack>
+            </ThemeProvider>
           )}
           <TextField
             id="email"

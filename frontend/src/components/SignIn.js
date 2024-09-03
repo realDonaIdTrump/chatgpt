@@ -130,11 +130,11 @@ export default function SignIn() {
     const email = data.get("email");
     const password = data.get("password");
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', { email, password });
-      alert(response.data.message); // Handle successful login
+      const response = await axios.post('http://localhost:5000/api/users/login', { email, password });
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Login failed. Please check your credentials.');
+      setPasswordError(true);
+      setPasswordErrorMessage("error");
     }
   };
 
