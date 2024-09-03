@@ -56,9 +56,76 @@ async function upsertGoogleUser(profile) {
   return result.rows[0];
 }
 
+// Update user's password by email
+async function updatePasswordByEmail(email, newPassword) {
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const query = `
+    UPDATE users
+    SET password = $1
+    WHERE email = $2
+    RETURNING id, email, updated_at
+  `;
+  const values = [hashedPassword, email];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+}
+
+// Save a password reset token and expiry date
+async function savePasswordResetToken(userId, resetToken, resetTokenExpiry) {
+  const query = `
+    UPDATE users
+    SET reset_token = $1, reset_token_expiry = $2
+    WHERE id = $3
+    RETURNING id
+  `;
+  const values = [resetToken, resetTokenExpiry, userId];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+}
+
+// Get a user by ID
+async function getUserById(id) {
+  const query = 'SELECT * FROM users WHERE id = $1';
+  const values = [id];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+}
+
+// Update user password and clear the reset token
+async function updateUserPassword(userId, newPassword) {
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const query = `
+    UPDATE users
+    SET password = $1, reset_token = NULL, reset_token_expiry = NULL
+    WHERE id = $2
+    RETURNING id, email, updated_at
+  `;
+  const values = [hashedPassword, userId];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+}
+
+// Clear the password reset token
+async function clearPasswordResetToken(userId) {
+  const query = `
+    UPDATE users
+    SET reset_token = NULL, reset_token_expiry = NULL
+    WHERE id = $1
+    RETURNING id
+  `;
+  const values = [userId];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+}
+
 module.exports = {
   createUser,
   findUserByEmail,
   findUserByGoogleId,
   upsertGoogleUser,
+  updatePasswordByEmail,
+  savePasswordResetToken,
+  getUserById,
+  updateUserPassword,
+  clearPasswordResetToken,
 };

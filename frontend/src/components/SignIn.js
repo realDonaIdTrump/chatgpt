@@ -178,17 +178,18 @@ export default function SignIn() {
   };
 
   const buttonSx = {
+    color: "white !important", // Ensure the text stays white in all states
     ...(success && {
       bgcolor: green[500],
-      color: "white", // Change text color to white on success
       "&:hover": {
         bgcolor: green[700],
       },
     }),
     ...(loading && {
-      color: "white", // Change text color to white when loading
+      color: "white !important", // Ensure the text stays white when loading
     }),
   };
+  
 
   return (
     <TemplateFrame

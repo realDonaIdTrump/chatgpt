@@ -7,18 +7,38 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import axios from 'axios';
 
 function ForgotPassword({ open, handleClose }) {
+  const [email, setEmail] = React.useState('');
+  const [error, setError] = React.useState('');
+  const [success, setSuccess] = React.useState('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log('Submitting:', email);
+  
+    try {
+      const response = await axios.post("http://localhost:5000/api/users/request-reset", { email });
+      console.log('Response:', response);
+      setSuccess(response.data.message);
+      setError('');
+      handleClose();
+    } catch (error) {
+      console.error('Error:', error);
+      setError(error.response?.data?.error || 'An error occurred.');
+      setSuccess('');
+    }
+  };
+  
+
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       PaperProps={{
         component: 'form',
-        onSubmit: (event) => {
-          event.preventDefault();
-          handleClose();
-        },
+        onSubmit: handleSubmit,
       }}
     >
       <DialogTitle>Reset password</DialogTitle>
@@ -39,7 +59,11 @@ function ForgotPassword({ open, handleClose }) {
           placeholder="Email address"
           type="email"
           fullWidth
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {success && <p style={{ color: 'green' }}>{success}</p>}
       </DialogContent>
       <DialogActions sx={{ pb: 3, px: 3 }}>
         <Button onClick={handleClose}>Cancel</Button>
