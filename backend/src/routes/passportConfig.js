@@ -1,11 +1,14 @@
-// src/middleware/passportConfig.js
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
-const { findUserByEmail } = require('../services/userService');
+const { findUserByEmail, getUserById } = require('../services/userService');
 
 // Configure Passport to use local strategy
 passport.use(new LocalStrategy(
+  {
+    usernameField: 'email', // Specify that 'email' should be treated as the username
+    passwordField: 'password'
+  },
   async (email, password, done) => {
     try {
       const user = await findUserByEmail(email);

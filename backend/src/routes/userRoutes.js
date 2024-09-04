@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
+const ensureAuthenticated = require('../middleware/authMiddleware');
 
 // Register new user
 router.post('/register', async (req, res) => {
@@ -26,6 +27,12 @@ router.post('/register', async (req, res) => {
 
 // Log in a user using Passport
 router.post('/login', (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
   passport.authenticate('local', (err, user, info) => {
     if (err) {
       return next(err);
@@ -41,6 +48,7 @@ router.post('/login', (req, res, next) => {
     });
   })(req, res, next);
 });
+
 
 // Request password reset
 router.post('/request-reset', async (req, res) => {
@@ -88,14 +96,22 @@ router.post('/request-reset', async (req, res) => {
   });
 });
 
-// GET /api/user - Get the logged-in user's data
-router.get('/user', (req, res) => {
-  if (!req.user) {
+// Add a route to get the logged-in user's info
+router.get('/user',ensureAuthenticated, (req, res) => {
+  if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+  res.json(req.user); // Assuming `user` is serialized to only include safe info
+});
 
-  const { id, email, name, created_at } = req.user;
-  res.status(200).json({ id, email, name, created_at });
+// Logout route
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Logout failed' });
+    }
+    res.status(200).json({ message: 'Logout successful' });
+  });
 });
 
 module.exports = router;

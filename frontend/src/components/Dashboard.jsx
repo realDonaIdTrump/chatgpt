@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Paper, Box, CircularProgress } from "@mui/material";
+import { Container, Typography, Paper, Box, CircularProgress, Button } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
-        if (!token) throw new Error("No token found");
-
-        const response = await axios.get(
-          "http://localhost:5000/api/users/user",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:5000/api/users/user", {
+          withCredentials: true // Ensure cookies are sent with the request
+        });
 
         setUserData(response.data);
         setLoading(false);
@@ -33,6 +27,15 @@ const Dashboard = () => {
 
     fetchUserData();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axios.get("http://localhost:5000/api/auth/logout", { withCredentials: true });
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <Container>
@@ -50,11 +53,15 @@ const Dashboard = () => {
               {error}
             </Typography>
           ) : (
-            <Typography variant="h6">
-              Welcome, {userData ? userData.email : "Loading..."}
-            </Typography>
+            <>
+              <Typography variant="h6">
+                Welcome, {userData ? userData.email : "Loading..."}
+              </Typography>
+              <Button variant="contained" color="primary" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
           )}
-          {/* Add more user data or components here */}
         </Paper>
       )}
     </Container>
