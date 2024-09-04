@@ -1,14 +1,16 @@
-// src/services/userService.js
-const bcrypt = require('bcrypt');
-const { Pool } = require('pg');
-require('dotenv').config();
+import bcrypt from 'bcrypt';
+import pg from 'pg';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+const { Pool } = pg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
 // Create a new user with email and password
-async function createUser(email, password) {
+export async function createUser(email, password) {
   const hashedPassword = await bcrypt.hash(password, 10);
   const query = `
     INSERT INTO users (email, password)
@@ -21,7 +23,7 @@ async function createUser(email, password) {
 }
 
 // Find a user by email
-async function findUserByEmail(email) {
+export async function findUserByEmail(email) {
   const query = 'SELECT * FROM users WHERE email = $1';
   const values = [email];
   const result = await pool.query(query, values);
@@ -29,7 +31,7 @@ async function findUserByEmail(email) {
 }
 
 // Find a user by Google ID
-async function findUserByGoogleId(googleId) {
+export async function findUserByGoogleId(googleId) {
   const query = 'SELECT * FROM users WHERE google_id = $1';
   const values = [googleId];
   const result = await pool.query(query, values);
@@ -37,7 +39,7 @@ async function findUserByGoogleId(googleId) {
 }
 
 // Create or update a user from Google OAuth
-async function upsertGoogleUser(profile) {
+export async function upsertGoogleUser(profile) {
   const { id: googleId, emails } = profile;
   const email = emails[0].value;
 
@@ -57,7 +59,7 @@ async function upsertGoogleUser(profile) {
 }
 
 // Update user's password by email
-async function updatePasswordByEmail(email, newPassword) {
+export async function updatePasswordByEmail(email, newPassword) {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   const query = `
     UPDATE users
@@ -71,7 +73,7 @@ async function updatePasswordByEmail(email, newPassword) {
 }
 
 // Save a password reset token and expiry date
-async function savePasswordResetToken(userId, resetToken, resetTokenExpiry) {
+export async function savePasswordResetToken(userId, resetToken, resetTokenExpiry) {
   const query = `
     UPDATE users
     SET reset_token = $1, reset_token_expiry = $2
@@ -84,7 +86,7 @@ async function savePasswordResetToken(userId, resetToken, resetTokenExpiry) {
 }
 
 // Get a user by ID
-async function getUserById(id) {
+export async function getUserById(id) {
   const query = 'SELECT * FROM users WHERE id = $1';
   const values = [id];
   const result = await pool.query(query, values);
@@ -92,7 +94,7 @@ async function getUserById(id) {
 }
 
 // Update user password and clear the reset token
-async function updateUserPassword(userId, newPassword) {
+export async function updateUserPassword(userId, newPassword) {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   const query = `
     UPDATE users
@@ -106,7 +108,7 @@ async function updateUserPassword(userId, newPassword) {
 }
 
 // Clear the password reset token
-async function clearPasswordResetToken(userId) {
+export async function clearPasswordResetToken(userId) {
   const query = `
     UPDATE users
     SET reset_token = NULL, reset_token_expiry = NULL
@@ -117,15 +119,3 @@ async function clearPasswordResetToken(userId) {
   const result = await pool.query(query, values);
   return result.rows[0];
 }
-
-module.exports = {
-  createUser,
-  findUserByEmail,
-  findUserByGoogleId,
-  upsertGoogleUser,
-  updatePasswordByEmail,
-  savePasswordResetToken,
-  getUserById,
-  updateUserPassword,
-  clearPasswordResetToken
-};

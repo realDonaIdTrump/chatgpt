@@ -1,11 +1,11 @@
-const express = require('express');
-const session = require('express-session');
-const passport = require('passport');
-const cors = require('cors');
-const userRoutes = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes');
-const dotenv = require('dotenv');
-const passportConfig = require('./routes/passportConfig'); // Ensure this is imported
+import express from 'express';
+import session from 'express-session';
+import passport from 'passport';
+import cors from 'cors';
+import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import dotenv from 'dotenv';
+import passportConfig from './routes/passportConfig.js'; // Ensure this is imported
 
 dotenv.config();
 
@@ -42,4 +42,4 @@ app.get('/', (req, res) => {
   res.send('Welcome to the ChatGPT App!');
 });
 
-module.exports = app;
+export default app;

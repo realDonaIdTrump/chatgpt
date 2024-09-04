@@ -19,14 +19,19 @@ const Dashboard = () => {
         setUserData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        setError(error.response?.data?.error || "An error occurred");
+        if (error.response?.status === 401) {
+          // Redirect to login if unauthorized
+          navigate("/login");
+        } else {
+          console.error("Error fetching user data:", error);
+          setError(error.response?.data?.error || "An error occurred");
+        }
         setLoading(false);
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {

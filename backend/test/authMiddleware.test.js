@@ -1,26 +1,29 @@
-// test/authMiddleware.test.js
-const request = require('supertest');
-const express = require('express');
-const chai = require('chai');
-const expect = chai.expect;
+import request from 'supertest';
+import express from 'express';
+import { expect } from 'chai';
 
-const ensureAuthenticated = require('../src/middleware/authMiddleware');
+import ensureAuthenticated from '../src/middleware/authMiddleware.js';
 
 // Setup Express app for testing
-const app = express();
-app.use(express.json());
-app.use((req, res, next) => {
-  // Mock the isAuthenticated method for testing
-  req.isAuthenticated = () => false; // Default to not authenticated
-  next();
-});
+const createApp = (isAuthenticated) => {
+  const app = express();
+  app.use(express.json());
+  app.use((req, res, next) => {
+    // Mock the isAuthenticated method based on test requirements
+    req.isAuthenticated = () => isAuthenticated; 
+    next();
+  });
 
-app.get('/protected', ensureAuthenticated, (req, res) => {
-  res.status(200).send('Protected Resource');
-});
+  app.get('/protected', ensureAuthenticated, (req, res) => {
+    res.status(200).send('Protected Resource');
+  });
+
+  return app;
+};
 
 describe('ensureAuthenticated Middleware', () => {
   it('should return 401 if the user is not authenticated', (done) => {
+    const app = createApp(false); // Not authenticated
     request(app)
       .get('/protected')
       .expect(401)
@@ -29,12 +32,7 @@ describe('ensureAuthenticated Middleware', () => {
   });
 
   it('should allow access if the user is authenticated', (done) => {
-    // Override the mock to simulate an authenticated user
-    app.use((req, res, next) => {
-      req.isAuthenticated = () => true;
-      next();
-    });
-
+    const app = createApp(true); // Authenticated
     request(app)
       .get('/protected')
       .expect(200)

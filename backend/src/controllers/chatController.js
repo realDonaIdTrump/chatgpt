@@ -1,5 +1,4 @@
-// backend/src/controllers/chatController.js
-const axios = require('axios');
+import axios from 'axios';
 
 const handleChat = async (req, res) => {
   const userMessage = req.body.message;
@@ -20,6 +19,4 @@ const handleChat = async (req, res) => {
   }
 };
 
-module.exports = {
-  handleChat
-};
+export { handleChat };

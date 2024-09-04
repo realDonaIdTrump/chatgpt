@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import bcrypt from 'bcrypt';
+import passport from 'passport';
+
 const router = express.Router();
-const User = require('../services/userService');
-const bcrypt = require('bcrypt');
-const passport = require('passport');
 
 // Start Google OAuth flow
 router.get('/google', passport.authenticate('google', {
@@ -17,4 +17,4 @@ router.get('/google/secrets',
   }
 );
 
-module.exports = router;
+export default router;

@@ -1,7 +1,7 @@
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
-const { findUserByEmail, getUserById } = require('../services/userService');
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import { findUserByEmail, getUserById } from '../services/userService.js';
 
 // Configure Passport to use local strategy
 passport.use(new LocalStrategy(
@@ -42,3 +42,5 @@ passport.deserializeUser(async (id, done) => {
     done(error);
   }
 });
+
+export default passport;

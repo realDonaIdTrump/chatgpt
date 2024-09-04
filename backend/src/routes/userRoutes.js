@@ -1,11 +1,12 @@
-const express = require('express');
+import express from 'express';
+import { createUser, findUserByEmail,savePasswordResetToken, updateUserPassword, clearPasswordResetToken } from '../services/userService.js';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
+import passport from 'passport';
+import ensureAuthenticated from '../middleware/authMiddleware.js';
+
 const router = express.Router();
-const { createUser, findUserByEmail, getUserById, saveSecurityQuestion, verifySecurityAnswer, savePasswordResetToken, updateUserPassword, clearPasswordResetToken } = require('../services/userService');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const passport = require('passport');
-const ensureAuthenticated = require('../middleware/authMiddleware');
 
 // Register new user
 router.post('/register', async (req, res) => {
@@ -48,7 +49,6 @@ router.post('/login', (req, res, next) => {
     });
   })(req, res, next);
 });
-
 
 // Request password reset
 router.post('/request-reset', async (req, res) => {
@@ -97,7 +97,7 @@ router.post('/request-reset', async (req, res) => {
 });
 
 // Add a route to get the logged-in user's info
-router.get('/user',ensureAuthenticated, (req, res) => {
+router.get('/user', ensureAuthenticated, (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -114,4 +114,4 @@ router.get('/logout', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;
