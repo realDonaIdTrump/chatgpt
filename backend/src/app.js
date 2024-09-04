@@ -1,10 +1,11 @@
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-const cors = require('cors'); // Import cors
+const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const dotenv = require('dotenv');
+const passportConfig = require('./routes/passportConfig'); // Ensure this is imported
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || 'default_session_secret',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Typically, this should be false for production
   })
 );
 

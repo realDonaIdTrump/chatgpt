@@ -54,14 +54,6 @@ function TemplateFrame({
               p: "8px 12px",
             }}
           >
-            <IconButton
-              size="small"
-              aria-label="Back to templates"
-              component="a"
-              href="/material-ui/getting-started/templates/"
-              sx={{ display: { xs: "auto", sm: "none" } }}
-            >
-            </IconButton>
             <Box sx={{ display: "flex", gap: 1, marginLeft: "auto"}}>
               <ToggleColorMode
                 data-screenshot="toggle-mode"

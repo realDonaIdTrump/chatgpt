@@ -127,5 +127,5 @@ module.exports = {
   savePasswordResetToken,
   getUserById,
   updateUserPassword,
-  clearPasswordResetToken,
+  clearPasswordResetToken
 };

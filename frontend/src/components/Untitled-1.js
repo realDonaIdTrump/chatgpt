@@ -17,13 +17,11 @@ import ForgotPassword from "./ForgotPassword";
 import getSignInTheme from "./theme/getSignInTheme";
 import { GoogleIcon, FacebookIcon } from "./CustomIcons";
 import TemplateFrame from "./TemplateFrame";
-import VectorIcon from "./VectorIcon"; // Import VectorIcon
+import VectorIcon from "./VectorIcon";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import CheckIcon from "@mui/icons-material/Check";
-import SaveIcon from "@mui/icons-material/Save";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -65,19 +63,17 @@ export default function SignIn() {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const timer = React.useRef(undefined);
   const navigate = useNavigate();
 
-  // This code only runs on the client side, to determine the system color preference
   React.useEffect(() => {
-    // Check if there is a preferred mode in localStorage
     const savedMode = localStorage.getItem("themeMode");
     if (savedMode) {
       setMode(savedMode);
     } else {
-      // If no preference is found, it uses system preference
       const systemPrefersDark = window.matchMedia(
         "(prefers-color-scheme: dark)"
       ).matches;
@@ -94,7 +90,7 @@ export default function SignIn() {
   const toggleColorMode = () => {
     const newMode = mode === "dark" ? "light" : "dark";
     setMode(newMode);
-    localStorage.setItem("themeMode", newMode); // Save the selected mode to localStorage
+    localStorage.setItem("themeMode", newMode);
   };
 
   const toggleCustomTheme = () => {
@@ -142,46 +138,51 @@ export default function SignIn() {
     const email = data.get("email");
     const password = data.get("password");
 
-    // Validate inputs before proceeding
     if (!validateInputs()) {
-      return; // Stop form submission if validation fails
+      return;
     }
-
     setSuccess(false);
     setLoading(true);
     timer.current = setTimeout(async () => {
       try {
         const response = await axios.post(
           "http://localhost:5000/api/users/login",
-          { email, password }
+          { email, password },
+          { withCredentials: true } // Include credentials with the request
         );
 
         if (response.status === 200) {
           setSuccess(true);
           setLoading(false);
-          // Redirect to home or dashboard
-          navigate("/dashboard"); // Adjust the redirect path as needed
+          navigate("/dashboard");
         } else {
-          // Handle login failure
           setLoading(false);
           setPasswordError(true);
-          setPasswordErrorMessage("Login failed. Please check your credentials.");
+          setPasswordErrorMessage(
+            "Login failed. Please check your credentials."
+          );
         }
       } catch (error) {
         console.error("Error logging in:", error);
         setLoading(false);
         setPasswordError(true);
-        setPasswordErrorMessage("An error occurred. Please try again.");
+        setPasswordErrorMessage(
+          error.response?.data?.error || "An error occurred. Please try again."
+        );
       }
     }, 2000); // Simulated delay
   };
 
   const buttonSx = {
+    color: "white !important",
     ...(success && {
       bgcolor: green[500],
-      '&:hover': {
+      "&:hover": {
         bgcolor: green[700],
       },
+    }),
+    ...(loading && {
+      color: "white !important",
     }),
   };
 
@@ -224,7 +225,7 @@ export default function SignIn() {
                   htmlFor="email"
                   sx={{
                     marginBottom: 1,
-                    textAlign: "left", // Ensures the label text is aligned to the left
+                    textAlign: "left",
                   }}
                 >
                   Email
@@ -272,60 +273,65 @@ export default function SignIn() {
                   color={passwordError ? "error" : "primary"}
                 />
               </FormControl>
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
-              <ForgotPassword open={open} handleClose={handleClose} />
               <Button
                 type="submit"
-                fullWidth
                 variant="contained"
-                disabled={loading}
+                size="large"
                 sx={buttonSx}
-                startIcon={loading ? <CircularProgress size={24} color="inherit" /> : success ? <CheckIcon /> : <SaveIcon />}
+                endIcon={loading && <CircularProgress color="inherit" size={24} />}
               >
-                {loading ? "Signing in..." : success ? "Signed in" : "Sign in"}
+                {loading ? "Signing in..." : "Sign In"}
               </Button>
-              <Typography sx={{ textAlign: "center" }}>
-                Don&apos;t have an account?{" "}
-                <span>
-                  <Link
-                    component="button"
-                    onClick={() => navigate("/sign-up")} // Use navigate to redirect
-                    variant="body2"
-                    sx={{ alignSelf: "center" }}
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Divider orientation="vertical" flexItem />
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    sx={{
+                      borderRadius: "50px",
+                      flex: 1,
+                      justifyContent: "center",
+                      bgcolor: "transparent",
+                      "&:hover": {
+                        bgcolor: "rgba(0,0,0,0.1)",
+                      },
+                    }}
+                    startIcon={<GoogleIcon />}
+                    onClick={() => {
+                      window.location.href = "http://localhost:5000/api/auth/google";
+                    }}
                   >
-                    Sign up
-                  </Link>
-                </span>
-              </Typography>
-            </Box>
-            <Divider>or</Divider>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Button
-                type="button"
-                fullWidth
-                variant="outlined"
-                onClick={() =>
-                  (window.location.href = "http://localhost:3000/auth/google")
-                } // Redirects to OAuth
-                startIcon={<GoogleIcon />}
-              >
-                Sign in with Google
-              </Button>
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="outlined"
-                onClick={() => alert("Sign in with Facebook")}
-                startIcon={<FacebookIcon />}
-              >
-                Sign in with Facebook
-              </Button>
+                    Sign In with Google
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    sx={{
+                      borderRadius: "50px",
+                      flex: 1,
+                      justifyContent: "center",
+                      bgcolor: "transparent",
+                      "&:hover": {
+                        bgcolor: "rgba(0,0,0,0.1)",
+                      },
+                    }}
+                    startIcon={<FacebookIcon />}
+                  >
+                    Sign In with Facebook
+                  </Button>
+                </Box>
+              </Box>
             </Box>
           </Card>
+          <ForgotPassword open={open} onClose={handleClose} />
         </SignInContainer>
       </ThemeProvider>
     </TemplateFrame>

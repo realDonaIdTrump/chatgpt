@@ -11,7 +11,6 @@ import axios from "axios";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 
-// Create a minimal theme that does not override Alert styles
 const minimalTheme = createTheme();
 
 const SignUpContainer = styled(Box)(({ theme }) => ({

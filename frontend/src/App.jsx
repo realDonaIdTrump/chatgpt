@@ -8,6 +8,7 @@ import './App.css';
 import SignInPage from './SignInPage'; // Import the SignInPage component
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignUp from './components/SignUp'; // Import SignUp component
+import Dashboard from './components/Dashboard';
 
 
 
@@ -34,6 +35,7 @@ function App() {
             <ChatOutput />
           </div>
         } />
+        <Route path="/dashboard" element={<Dashboard />} /> {/* Add the Dashboard route */}
       </Routes>
     </Router>
   );

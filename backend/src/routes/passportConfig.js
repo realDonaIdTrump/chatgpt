@@ -1,54 +1,41 @@
+// src/middleware/passportConfig.js
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
-const User = require('../services/userService');
 const bcrypt = require('bcrypt');
-require('dotenv').config();
+const { findUserByEmail } = require('../services/userService');
 
-// Google OAuth strategy
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/secrets'
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      let user = await User.upsertGoogleUser(profile);
-      return done(null, user);
-    } catch (error) {
-      return done(error, null);
-    }
-  }
-));
-
-// Local strategy
-passport.use(new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password'
-  },
+// Configure Passport to use local strategy
+passport.use(new LocalStrategy(
   async (email, password, done) => {
     try {
-      const user = await User.findUserByEmail(email);
-      if (!user || !(await bcrypt.compare(password, user.password))) {
-        return done(null, false, { message: 'Invalid credentials' });
+      const user = await findUserByEmail(email);
+      if (!user) {
+        return done(null, false, { message: 'Incorrect email.' });
       }
+
+      const isPasswordCorrect = await bcrypt.compare(password, user.password);
+      if (!isPasswordCorrect) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+
       return done(null, user);
     } catch (error) {
-      return done(error, null);
+      return done(error);
     }
   }
 ));
 
-// Serialize and deserialize user
+// Serialize user to store in session
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
+// Deserialize user from session
 passport.deserializeUser(async (id, done) => {
   try {
-    let user = await User.findUserByEmail(id); // Adjust if necessary
+    const user = await getUserById(id);
     done(null, user);
   } catch (error) {
-    done(error, null);
+    done(error);
   }
 });

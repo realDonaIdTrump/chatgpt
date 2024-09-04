@@ -17,9 +17,11 @@ function ForgotPassword({ open, handleClose }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log('Submitting:', email);
-  
+
     try {
-      const response = await axios.post("http://localhost:5000/api/users/request-reset", { email });
+      const response = await axios.post("http://localhost:5000/api/users/request-reset", {
+        email
+      });
       console.log('Response:', response);
       setSuccess(response.data.message);
       setError('');
@@ -30,7 +32,6 @@ function ForgotPassword({ open, handleClose }) {
       setSuccess('');
     }
   };
-  
 
   return (
     <Dialog
@@ -41,13 +42,12 @@ function ForgotPassword({ open, handleClose }) {
         onSubmit: handleSubmit,
       }}
     >
-      <DialogTitle>Reset password</DialogTitle>
+      <DialogTitle>Reset Password</DialogTitle>
       <DialogContent
         sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
       >
         <DialogContentText>
-          Enter your account&apos;s email address, and we&apos;ll send you a link to
-          reset your password.
+          Enter your account's email address to receive a password reset link.
         </DialogContentText>
         <OutlinedInput
           autoFocus

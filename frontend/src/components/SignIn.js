@@ -22,9 +22,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import Fab from "@mui/material/Fab";
-import CheckIcon from "@mui/icons-material/Check";
-import SaveIcon from "@mui/icons-material/Save";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -152,14 +149,15 @@ export default function SignIn() {
       try {
         const response = await axios.post(
           "http://localhost:5000/api/users/login",
-          { email, password }
+          { email, password },
+          { withCredentials: true }
         );
 
         if (response.status === 200) {
+          localStorage.setItem('token', response.data.token); // Store the token
           setSuccess(true);
           setLoading(false);
-          // Redirect to home or dashboard
-          navigate("/dashboard"); // Adjust the redirect path as needed
+          navigate("/dashboard"); // Redirect to dashboard
         } else {
           // Handle login failure
           setLoading(false);
@@ -172,7 +170,9 @@ export default function SignIn() {
         console.error("Error logging in:", error);
         setLoading(false);
         setPasswordError(true);
-        setPasswordErrorMessage("An error occurred. Please try again.");
+        setPasswordErrorMessage(
+          error.response?.data?.error || "An error occurred. Please try again."
+        );
       }
     }, 2000); // Simulated delay
   };
@@ -323,16 +323,6 @@ export default function SignIn() {
                 startIcon={<GoogleIcon />}
               >
                 Sign in with Google
-              </Button>
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="outlined"
-                onClick={() => alert("Sign in with Facebook")}
-                startIcon={<FacebookIcon />}
-              >
-                Sign in with Facebook
               </Button>
             </Box>
           </Card>
