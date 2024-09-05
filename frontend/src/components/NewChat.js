@@ -15,12 +15,15 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-export default function NewChat() {
+export default function NewChat(props) {
+  function handleClick(){
+    props.onClick("New Chat");
+  }
   return (
     <Button
-      component="label"
       role={undefined}
       variant="contained"
+      onClick={handleClick}
       tabIndex={-1}
       startIcon={<AddIcon />}
       sx={{ margin: "0.5rem 0.2rem", backgroundColor: "#B70032"}}
@@ -28,8 +31,6 @@ export default function NewChat() {
       New Chat
       <VisuallyHiddenInput
         type="button"
-        onChange={(event) => console.log(event.target.files)}
-        multiple
       />
     </Button>
   );

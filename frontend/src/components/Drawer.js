@@ -34,6 +34,9 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import NewChat from "./NewChat";
+import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ViewSidebarRoundedIcon from "@mui/icons-material/ViewSidebarRounded";
 
 const drawerWidth = 240;
 
@@ -124,11 +127,12 @@ function stringAvatar(email) {
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [list, setList] = useState([]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -189,6 +193,12 @@ export default function PersistentDrawerLeft() {
     setAnchorEl(null);
   };
 
+function handleChildClick(data){
+  console.log(data);
+  setList(...[data]);
+  console.log(list);
+  
+};
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -206,7 +216,7 @@ export default function PersistentDrawerLeft() {
               open && { display: "none" },
             ]}
           >
-            <ArrowLogo />
+            <ViewSidebarRoundedIcon sx={{ color: "#B70032" }} />
           </IconButton>
           <Typography
             variant="h6"
@@ -254,6 +264,7 @@ export default function PersistentDrawerLeft() {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
+          height: "100vh", // Ensure the drawer takes the full height of the viewport
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
@@ -267,32 +278,17 @@ export default function PersistentDrawerLeft() {
           <VectorIcon />
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
+              <ViewSidebarRoundedIcon sx={{ color: "#B70032" }} />
             ) : (
-              <ChevronRightIcon />
+              <ViewSidebarRoundedIcon />
             )}
           </IconButton>
         </DrawerHeader>
         <Divider />
-        
-        <NewChat />
+
+        <NewChat onClick={handleChildClick}/>
         <List>
-          {["New chat", "New chat", "New chat", "New chat"].map(
-            (text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            )
-          )}
-        </List>
-        <Divider />
-        <List>
-          {["Clear Conversation", "Updates & FAQ"].map((text, index) => (
+          {[list].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
@@ -303,7 +299,54 @@ export default function PersistentDrawerLeft() {
             </ListItem>
           ))}
         </List>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+            justifyContent: "flex-end", // Align items to the bottom
+            padding: 1,
+          }}
+        >
+          <Divider />
+          <Stack
+            direction="column"
+            spacing={1}
+            sx={{
+              width: "100%",
+              marginTop: "1rem",
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                border: "0",
+                color: "#B70032",
+                justifyContent: "flex-start",
+                whiteSpace: "nowrap", // Prevent text wrapping
+              }} // Align icon and text to the left
+              startIcon={<DeleteIcon />}
+              fullWidth
+            >
+              Clear Conversation
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                border: "0",
+                color: "#B70032",
+                justifyContent: "flex-start",
+              }} // Align icon and text to the left
+              startIcon={<OpenInNewIcon />}
+              fullWidth
+            >
+              Updates & FAQ
+            </Button>
+          </Stack>
+        </Box>
       </Drawer>
+
       <Main open={open}>
         <DrawerHeader />
         <Typography sx={{ marginBottom: 2 }}>
