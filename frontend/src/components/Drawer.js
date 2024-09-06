@@ -37,6 +37,7 @@ import NewChat from "./NewChat";
 import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ViewSidebarRoundedIcon from "@mui/icons-material/ViewSidebarRounded";
+import FontAwesomeSvgIconDemo from './FontAwesomeSvgIcon';
 
 const drawerWidth = 240;
 
@@ -132,7 +133,7 @@ export default function PersistentDrawerLeft() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(["New Chat"]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -193,12 +194,14 @@ export default function PersistentDrawerLeft() {
     setAnchorEl(null);
   };
 
-function handleChildClick(data){
-  console.log(data);
-  setList(...[data]);
-  console.log(list);
-  
-};
+  function handleChildClick(data) {
+    setList((prevState) => [...prevState, [data]]);
+  }
+
+  function handleDeleteChat(id) {
+    setList((prevList) => prevList.filter((_, index) => index !== id));
+    console.log('Delete button clicked');
+  }  
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -286,15 +289,16 @@ function handleChildClick(data){
         </DrawerHeader>
         <Divider />
 
-        <NewChat onClick={handleChildClick}/>
+        <NewChat onClick={handleChildClick} />
         <List>
-          {[list].map((text, index) => (
-            <ListItem key={text} disablePadding>
+          {list.map((text, index) => (
+            <ListItem key={index} id={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                 </ListItemIcon>
                 <ListItemText primary={text} />
+                <FontAwesomeSvgIconDemo onDelete={()=>handleDeleteChat(index)}/>
               </ListItemButton>
             </ListItem>
           ))}
