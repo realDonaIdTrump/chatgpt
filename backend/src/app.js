@@ -4,6 +4,7 @@ import passport from 'passport';
 import cors from 'cors';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 import dotenv from 'dotenv';
 import passportConfig from './routes/passportConfig.js'; // Ensure this is imported
 
@@ -36,6 +37,7 @@ app.use(passport.session());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
+app.use('/chat', chatRoutes);
 
 // Default Route
 app.get('/', (req, res) => {
