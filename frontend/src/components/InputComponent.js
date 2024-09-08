@@ -1,30 +1,45 @@
-// InputComponent.js
-import React, { useState } from 'react';
-import { Container, InputBase, IconButton } from '@mui/material';
+import React from 'react';
+import { Box, InputBase, IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
-const InputComponent = ({ onChange, inputValue }) => {
+const InputComponent = ({ onSendMessage, inputValue, setInputValue }) => {
+
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSendClick = () => {
+    if (inputValue.trim()) {
+      onSendMessage(inputValue);
+      setInputValue('');
+    }
+  };
+
   return (
-    <Container
-      component="form"
+    <Box
       sx={{
         p: '2px 4px',
         display: 'flex',
         alignItems: 'center',
-        width: 800,
+        maxWidth: '100%',
         backgroundColor: 'rgb(244 244 244)',
-        justifyContent: 'flex-end'
+        position: 'sticky',
+        bottom: 0,
+        width: '100%',
+        justifyContent: 'center',
+        zIndex: 1000,
       }}
     >
       <InputBase
         sx={{ ml: 1, flex: 1 }}
-        placeholder="Message PREEvision GPT"
-        inputProps={{ 'aria-label': 'search preevision' }}
-        onChange={onChange}
+        placeholder="Type a message..."
+        inputProps={{ 'aria-label': 'chat input' }}
+        onChange={handleInputChange}
         value={inputValue}
       />
       <IconButton
-        type="button"
+        onClick={handleSendClick} // Handle button click
         sx={{
           p: '10px',
           color: inputValue ? 'black' : null,
@@ -35,11 +50,11 @@ const InputComponent = ({ onChange, inputValue }) => {
           },
         }}
         aria-label="send"
-        disabled={!inputValue}
+        disabled={!inputValue.trim()}
       >
         <SendIcon />
       </IconButton>
-    </Container>
+    </Box>
   );
 };
 
