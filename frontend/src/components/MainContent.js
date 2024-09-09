@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { styled } from "@mui/material/styles";
 import { Container, Box } from "@mui/material";
 import InputComponent from "./InputComponent"; // Import the new InputComponent
+import CodeSnippet from "./CodeSnippet";
 
 const drawerWidth = 240;
 
@@ -57,6 +58,7 @@ const MainContent = ({ open }) => {
       const botResponse = {
         sender: "bot",
         text: "This is a response from the bot!",
+        code: `import React from 'react';\n\nconst MyComponent = () => {\n  return <div>Hello World!</div>;\n};\n\nexport default MyComponent;`,
       };
       setMessages((prevMessages) => [...prevMessages, botResponse]);
     }, 1000); // Simulated delay for bot response
@@ -78,15 +80,22 @@ const MainContent = ({ open }) => {
           flexGrow: 1, 
           display: "flex", 
           flexDirection: "column", 
-          height: "calc(100vh - 64px)" // Adjust the height to ensure the scroll area fits the screen
+          alignItems: "center", // Center content horizontally
+          justifyContent: "space-between", // Ensure proper space distribution between content and input
+          height: "calc(100vh - 64px)", // Ensure the content fits within the viewport
         }}
       >
+        {/* Message box with fixed width on MD+ and responsive on smaller screens */}
         <Box
           sx={{
+            width: { xs: '95%', sm: '85%', md: '800px' }, // Responsive width for XS and SM, fixed for MD+
+            maxHeight: "calc(100vh - 150px)", // Limit height to make sure scrolling works
             flexGrow: 1,
             overflowY: "auto", // Enable vertical scroll
-            paddingBottom: "80px", // Reserve space for the input field
-            maxHeight: "100%", // Ensure the box can grow and show scrollbar if content overflows
+            backgroundColor: "#f0f0f0", // Set background color
+            padding: "20px", // Add some padding inside the box
+            borderRadius: "8px", // Rounded corners
+            mb: 2, // Margin bottom for spacing between messages and input
           }}
         >
           {messages.map((msg, index) => (
@@ -95,16 +104,26 @@ const MainContent = ({ open }) => {
               style={{ textAlign: msg.sender === "user" ? "right" : "left" }}
             >
               <p>{msg.text}</p>
+              {msg.code && <CodeSnippet code={`const sum = (a, b) => a + b;`} language="javascript" />
+            }
             </div>
           ))}
           <div ref={messageEndRef} /> {/* Auto-scroll to the bottom */}
         </Box>
-        <InputComponent
-          onChange={handleChange}
-          onSendMessage={handleSendMessage}
-          inputValue={inputValue}
-          setInputValue={setInputValue}
-        />
+
+        {/* Input Component with consistent responsive width */}
+        <Box
+          sx={{
+            width: { xs: '95%', sm: '85%', md: '800px' }, // Same width as message box
+            bottom: 0, // Fixed at the bottom of the container
+          }}
+        >
+          <InputComponent
+            onSendMessage={handleSendMessage}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+          />
+        </Box>
       </Container>
     </Main>
   );
