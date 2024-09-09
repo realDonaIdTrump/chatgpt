@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { styled } from "@mui/material/styles";
-import { Container, Box } from "@mui/material";
+import { Container, Box, Avatar, Typography } from "@mui/material";
 import InputComponent from "./InputComponent"; // Import the new InputComponent
 import CodeSnippet from "./CodeSnippet";
 
@@ -16,7 +16,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
     }),
     display: "flex",
     flexDirection: "column",
-    minHeight: "100vh", // Make sure the main container takes full viewport height
+    minHeight: "100vh", // Ensure the main container takes full viewport height
     marginLeft: `-${drawerWidth}px`,
     variants: [
       {
@@ -46,10 +46,6 @@ const MainContent = ({ open }) => {
   const [messages, setMessages] = useState([]);
   const messageEndRef = useRef(null);
 
-  const handleChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
   const handleSendMessage = (message) => {
     const userMessage = { sender: "user", text: message };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -76,37 +72,79 @@ const MainContent = ({ open }) => {
       <DrawerHeader />
       <Container
         maxWidth="lg"
-        sx={{ 
-          flexGrow: 1, 
-          display: "flex", 
-          flexDirection: "column", 
-          alignItems: "center", // Center content horizontally
-          justifyContent: "space-between", // Ensure proper space distribution between content and input
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "space-between",
           height: "calc(100vh - 64px)", // Ensure the content fits within the viewport
         }}
       >
         {/* Message box with fixed width on MD+ and responsive on smaller screens */}
         <Box
           sx={{
-            width: { xs: '95%', sm: '85%', md: '800px' }, // Responsive width for XS and SM, fixed for MD+
+            width: { xs: "95%", sm: "85%", md: "800px" }, // Responsive width for XS and SM, fixed for MD+
             maxHeight: "calc(100vh - 150px)", // Limit height to make sure scrolling works
             flexGrow: 1,
             overflowY: "auto", // Enable vertical scroll
-            backgroundColor: "#f0f0f0", // Set background color
             padding: "20px", // Add some padding inside the box
             borderRadius: "8px", // Rounded corners
             mb: 2, // Margin bottom for spacing between messages and input
           }}
         >
           {messages.map((msg, index) => (
-            <div
+            <Box
               key={index}
-              style={{ textAlign: msg.sender === "user" ? "right" : "left" }}
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent:
+                  msg.sender === "user" ? "flex-end" : "flex-start",
+                mb: 2, // Add margin between messages
+              }}
             >
-              <p>{msg.text}</p>
-              {msg.code && <CodeSnippet code={`const sum = (a, b) => a + b;`} language="javascript" />
-            }
-            </div>
+              {/* Display avatar next to the message */}
+              {msg.sender === "bot" && (
+                <Avatar
+                  alt="Bot"
+                  src="/bot-avatar.png" // Replace with your bot avatar
+                  sx={{ mr: 2 }}
+                />
+              )}
+
+              <Box
+                sx={{
+                  backgroundColor:
+                    msg.sender === "user" ? "#e3e3e3" : "transparent", // Background color for user messages only
+                  borderRadius: "8px",
+                  width: msg.sender === "user" ? "50%" : "100%", // Adjust width based on sender
+                  padding: "10px 15px",
+                  textAlign: msg.sender === "user" ? "right" : "left",
+                  wordBreak: "break-word", // Ensure long words break correctly
+                }}
+              >
+                <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+                  {msg.text}
+                </Typography>
+
+                {/* If the message contains code, render the code snippet */}
+                {msg.code && (
+                  <Box mt={1}>
+                    <CodeSnippet code={msg.code} language="javascript" />
+                  </Box>
+                )}
+              </Box>
+
+              {/* User's avatar on the right side */}
+              {msg.sender === "user" && (
+                <Avatar
+                  alt="User"
+                  src="/user-avatar.png" // Replace with your user avatar
+                  sx={{ ml: 2 }}
+                />
+              )}
+            </Box>
           ))}
           <div ref={messageEndRef} /> {/* Auto-scroll to the bottom */}
         </Box>
@@ -114,7 +152,7 @@ const MainContent = ({ open }) => {
         {/* Input Component with consistent responsive width */}
         <Box
           sx={{
-            width: { xs: '95%', sm: '85%', md: '800px' }, // Same width as message box
+            width: { xs: "95%", sm: "85%", md: "800px" }, // Same width as message box
             bottom: 0, // Fixed at the bottom of the container
           }}
         >

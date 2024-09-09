@@ -1,9 +1,63 @@
 import React from 'react';
-import { Box, InputBase, IconButton } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import { styled } from '@mui/system';
+
+const blue = {
+  100: '#DAECFF',
+  200: '#b6daff',
+  400: '#3399FF',
+  500: '#007FFF',
+  600: '#0072E5',
+  900: '#003A75',
+};
+
+const grey = {
+  50: '#F3F6F9',
+  100: '#E5EAF2',
+  200: '#DAE2ED',
+  300: '#C7D0DD',
+  400: '#B0B8C4',
+  500: '#9DA8B7',
+  600: '#6B7A90',
+  700: '#434D5B',
+  800: '#303740',
+  900: '#1C2025',
+};
+
+const StyledTextareaAutosize = styled(TextareaAutosize)(
+  ({ theme }) => `
+  box-sizing: border-box;
+  width: 100%; // Full width
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
+  background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
+  border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
+  box-shadow: 0px 2px 2px ${theme.palette.mode === 'dark' ? grey[900] : grey[50]};
+
+  &:hover {
+    border-color: ${blue[400]};
+  }
+
+  &:focus {
+    border-color: ${blue[400]};
+    box-shadow: 0 0 0 3px ${theme.palette.mode === 'dark' ? blue[600] : blue[200]};
+  }
+
+  // Firefox
+  &:focus-visible {
+    outline: 0;
+  }
+`,
+);
 
 const InputComponent = ({ onSendMessage, inputValue, setInputValue }) => {
-
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
@@ -17,7 +71,8 @@ const InputComponent = ({ onSendMessage, inputValue, setInputValue }) => {
 
   // Handle sending message when "Enter" is pressed
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && inputValue.trim()) {
+    if (e.key === 'Enter' && !e.shiftKey && inputValue.trim()) {
+      e.preventDefault(); // Prevents the default behavior of adding a new line
       handleSendClick();
     }
   };
@@ -25,34 +80,33 @@ const InputComponent = ({ onSendMessage, inputValue, setInputValue }) => {
   return (
     <Box
       sx={{
-        p: '10px',
+        p: '5px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center', // Center the input horizontally
         backgroundColor: 'rgb(244, 244, 244)',
-        zIndex: 1000,
-        borderRadius: '8px', // Add rounded corners
-        boxShadow: '0px -1px 5px rgba(0, 0, 0, 0.1)', // Shadow for depth
-        mb: 2, // Add a margin bottom to keep input above viewport edge
+        borderRadius: '8px',
+        boxShadow: '0px -1px 5px rgba(0, 0, 0, 0.1)',
+        mb: 2,
       }}
     >
-      <InputBase
-        sx={{ ml: 1, flex: 1 }} // Full width of the container
-        placeholder="Type a message..."
-        inputProps={{ 'aria-label': 'chat input' }}
-        onChange={handleInputChange}
+      <StyledTextareaAutosize
+        minRows={1} // Minimum rows to show
+        maxRows={4} // Maximum rows to show before scrolling
+        aria-label="message input"
+        placeholder="Type your message..."
         value={inputValue}
-        onKeyDown={handleKeyDown} // Handle "Enter" key
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
       />
       <IconButton
         onClick={handleSendClick}
         sx={{
           p: '10px',
-          color: inputValue ? 'black' : null, // Change color if there's input
+          color: inputValue ? 'black' : 'gray', // Change color if there's input
           '&:hover': {
-            color: inputValue ? '#B70032' : null, // Change on hover
-            backgroundColor: 'transparent', // No background on hover
-            boxShadow: 'none', // No shadow on hover
+            color: inputValue ? '#B70032' : 'gray', // Change on hover
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
           },
         }}
         aria-label="send"
