@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { styled } from '@mui/system';
@@ -42,12 +42,12 @@ const StyledTextareaAutosize = styled(TextareaAutosize)(
   box-shadow: 0px 2px 2px ${theme.palette.mode === 'dark' ? grey[900] : grey[50]};
 
   &:hover {
-    border-color: ${blue[400]};
+    border-color: ${"#B70032"};
   }
 
   &:focus {
-    border-color: ${blue[400]};
-    box-shadow: 0 0 0 3px ${theme.palette.mode === 'dark' ? blue[600] : blue[200]};
+    border-color: ${"#B70032"};
+    box-shadow: 0 0 0 3px ${theme.palette.mode === 'dark' ? "#B70032" : "#F4A8A8"};
   }
 
   // Firefox
@@ -78,15 +78,16 @@ const InputComponent = ({ onSendMessage, inputValue, setInputValue }) => {
   };
 
   return (
+    <Box sx={{p: '5px',mb: 0,}}>
     <Box
       sx={{
-        p: '5px',
+        
         display: 'flex',
         alignItems: 'center',
         backgroundColor: 'rgb(244, 244, 244)',
         borderRadius: '8px',
         boxShadow: '0px -1px 5px rgba(0, 0, 0, 0.1)',
-        mb: 2,
+        
       }}
     >
       <StyledTextareaAutosize
@@ -114,6 +115,19 @@ const InputComponent = ({ onSendMessage, inputValue, setInputValue }) => {
       >
         <SendIcon />
       </IconButton>
+    </Box>
+          {/* Adding the message below the input box */}
+          <Typography
+        variant="body2"
+        sx={{
+          color: 'gray',
+          mt: 1, // Add some margin to the top of the text
+          fontSize: '0.85rem',
+          textAlign: 'center',
+        }}
+      >
+        ChatGPT can make mistakes. Check important info.
+      </Typography>
     </Box>
   );
 };
