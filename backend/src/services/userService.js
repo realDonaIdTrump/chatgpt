@@ -6,7 +6,11 @@ dotenv.config();
 
 const { Pool } = pg;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  user: process.env.DB_USER || 'chatgpt_user',
+  host: process.env.DB_HOST || 'localhost',
+  database: process.env.DB_NAME || 'chatbot',
+  password: process.env.DB_PASSWORD || 'preevision', // Ensure this is a string
+  port: process.env.DB_PORT || 5432,
 });
 
 // Create a new user with email and password
